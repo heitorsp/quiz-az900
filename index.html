@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Simulado de estudo para o AZ-900 (Microsoft Azure Fundamentals): 100 questões, 10 sorteadas por tentativa e nota de 0 a 100.">
+<title>Quiz AZ-900</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; }
+  [hidden] { display: none !important; }
+  img { max-width: 100%; }
+
+  /* Layout: coluna única de leitura (~42rem). Cabeçalho de prova, trilha de 10 segmentos, cartão da questão. */
+  :root {
+    --bg: #EDF1F4;
+    --surface: #FFFFFF;
+    --ink: #13212D;
+    --muted: #556472;
+    --line: #D2DBE3;
+    --accent: #0F6CBD;
+    --accent-soft: #E3EFFA;
+    --ok: #17784A;
+    --ok-soft: #E2F2E9;
+    --bad: #B42318;
+    --bad-soft: #FBE8E6;
+    --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+    --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0D141B; --surface: #15202A; --ink: #E5ECF2; --muted: #93A2B0; --line: #273541;
+      --accent: #5CA9EE; --accent-soft: #14304A; --ok: #4CC48A; --ok-soft: #133426;
+      --bad: #F2776E; --bad-soft: #3A1D1B; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0D141B; --surface: #15202A; --ink: #E5ECF2; --muted: #93A2B0; --line: #273541;
+    --accent: #5CA9EE; --accent-soft: #14304A; --ok: #4CC48A; --ok-soft: #133426;
+    --bad: #F2776E; --bad-soft: #3A1D1B; color-scheme: dark;
+  }
+
+  body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .wrap { max-width: 42rem; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; display: grid; gap: 20px; }
+
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  h1 { font-family: var(--display); font-weight: 700; font-size: clamp(1.6rem, 5.5vw, 2.1rem); line-height: 1.12; margin: 6px 0 0; text-wrap: balance; letter-spacing: -.01em; }
+  h2 { font-size: 1.15rem; font-weight: 600; line-height: 1.4; margin: 0; text-wrap: balance; }
+  h3 { font-family: var(--display); font-weight: 600; font-size: 1.15rem; margin: 0; }
+
+  .top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; }
+  .top > div { min-width: 0; }
+  .meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .best { font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .best b { color: var(--ink); font-weight: 500; }
+
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .primary { background: var(--accent); color: var(--surface); border: 0; border-radius: 8px; padding: 11px 18px; font-weight: 600; }
+  .primary:hover { filter: brightness(1.08); }
+  .ghost { background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; font-size: 14px; color: var(--ink); }
+  .ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Trilha de progresso: um segmento por questão, colorido conforme o resultado. */
+  .trail { display: grid; gap: 8px; }
+  .segs { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+  .segs span { height: 6px; border-radius: 3px; background: var(--line); transition: background-color .2s; }
+  .segs span.now { background: var(--accent); }
+  .segs span.ok { background: var(--ok); }
+  .segs span.bad { background: var(--bad); }
+  .trail-row { display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 20px; display: grid; gap: 18px; min-width: 0; }
+  .qhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .chip { font-family: var(--mono); font-size: 12px; letter-spacing: .04em; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 10px; }
+  .qnum { font-family: var(--display); font-weight: 600; color: var(--muted); font-size: 15px; }
+
+  .options { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .opt { width: 100%; text-align: left; display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; line-height: 1.45; transition: border-color .15s, background-color .15s; }
+  .opt:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }
+  .opt:disabled { cursor: default; }
+  .opt .key { font-family: var(--mono); font-size: 13px; width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; border: 1px solid var(--line); color: var(--muted); }
+  .opt .txt { min-width: 0; padding-top: 2px; }
+  .opt.correct { border-color: var(--ok); background: var(--ok-soft); }
+  .opt.correct .key { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+  .opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+  .opt.wrong .key { background: var(--bad); border-color: var(--bad); color: var(--surface); }
+  .opt.dim { opacity: .62; }
+
+  .feedback { border-left: 3px solid var(--ok); padding: 4px 0 4px 14px; display: grid; gap: 4px; }
+  .feedback.bad { border-left-color: var(--bad); }
+  .verdict { margin: 0; font-weight: 600; color: var(--ok); }
+  .feedback.bad .verdict { color: var(--bad); }
+  .feedback p:last-child { margin: 0; color: var(--ink); }
+  .actions { display: flex; justify-content: flex-end; }
+
+  .score { display: flex; align-items: baseline; gap: 6px; font-variant-numeric: tabular-nums; }
+  .score b { font-family: var(--display); font-weight: 700; font-size: clamp(3.6rem, 16vw, 5rem); line-height: 1; }
+  .score span { font-family: var(--display); font-weight: 600; font-size: 1.4rem; color: var(--muted); }
+  .band { display: inline-block; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: 3px 10px; background: var(--accent-soft); color: var(--accent); }
+  .band.ok { background: var(--ok-soft); color: var(--ok); }
+  .band.bad { background: var(--bad-soft); color: var(--bad); }
+  .summary { margin: 0; color: var(--muted); }
+  .result-head { display: grid; gap: 10px; }
+
+  .review { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+  .review li { padding: 16px 0; border-bottom: 1px solid var(--line); display: grid; gap: 8px; min-width: 0; }
+  .rv-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .pill { font-family: var(--mono); font-size: 12px; border-radius: 999px; padding: 2px 9px; }
+  .pill.ok { background: var(--ok-soft); color: var(--ok); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+  .rv-cat { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .rv-q { margin: 0; font-weight: 600; }
+  .rv-a { margin: 0; font-size: 15px; color: var(--muted); }
+  .rv-a b { color: var(--ink); font-weight: 500; }
+  details { font-size: 15px; }
+  summary { cursor: pointer; color: var(--accent); font-weight: 500; width: fit-content; }
+  details p { margin: 6px 0 0; }
+
+  .foot { font-size: 14px; color: var(--muted); display: grid; gap: 4px; }
+  .foot p { margin: 0; }
+  kbd { font-family: var(--mono); font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; background: var(--surface); }
+
+  @media (max-width: 420px) {
+    .card { padding: 18px 16px; }
+    .opt { grid-template-columns: 26px 1fr; gap: 10px; padding: 11px 12px; }
+    .opt .key { width: 26px; height: 26px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow" id="bankInfo">Azure Fundamentals · 100 questões · 10 por tentativa</p>
+      <h1>Quiz AZ-900</h1>
+    </div>
+    <div class="meta">
+      <span class="best">Melhor nota: <b id="best">—</b></span>
+      <button type="button" class="ghost" id="restart">Nova tentativa</button>
+    </div>
+  </header>
+
+  <div class="trail" id="trail" aria-hidden="true">
+    <div class="segs" id="segs"></div>
+    <div class="trail-row"><span id="count">Questão 1 de 10</span><span id="points">0 pontos</span></div>
+  </div>
+
+  <section class="card" id="quiz" aria-live="polite">
+    <div class="qhead">
+      <span class="chip" id="cat">Categoria</span>
+      <span class="qnum" id="qnum">Q1</span>
+    </div>
+    <h2 id="question">Carregando questão…</h2>
+    <ol class="options" id="options"></ol>
+    <div class="feedback" id="feedback" hidden>
+      <p class="verdict" id="verdict"></p>
+      <p id="explain"></p>
+    </div>
+    <div class="actions">
+      <button type="button" class="primary" id="next" hidden>Próxima questão</button>
+    </div>
+  </section>
+
+  <section class="card" id="result" hidden>
+    <div class="result-head">
+      <p class="eyebrow">Resultado da tentativa</p>
+      <div class="score"><b id="score">0</b><span>/100</span></div>
+      <div><span class="band" id="band">—</span></div>
+      <p class="summary" id="summary"></p>
+      <div><button type="button" class="primary" id="again">Fazer nova tentativa</button></div>
+    </div>
+    <h3>Revisão das respostas</h3>
+    <ol class="review" id="review"></ol>
+  </section>
+
+  <footer class="foot">
+    <p>Cada acerto vale 10 pontos. As questões e a ordem das alternativas são sorteadas a cada tentativa.</p>
+    <p>Questões originais para estudo, sem vínculo com a Microsoft e sem reproduzir questões da prova oficial.</p>
+    <p>No teclado: <kbd>1</kbd>–<kbd>4</kbd> ou <kbd>A</kbd>–<kbd>D</kbd> para responder e <kbd>Enter</kbd> para avançar.</p>
+  </footer>
+</main>
+
+<script>
+// Convenção do banco: em cada questão, alternativas[0] é a correta.
+// A ordem exibida é embaralhada a cada tentativa.
+let BANCO = [];
+const POR_TENTATIVA = 10;
+const LETRAS = ["A", "B", "C", "D"];
+const CHAVE_MELHOR = "quiz-az900-melhor-nota";
+
+const $ = (id) => document.getElementById(id);
+let items = [];   // [{ i: índice no banco, ordem: [índices originais na ordem exibida] }]
+let pos = 0;      // questão atual
+let answers = []; // índice original escolhido (0 = correta) ou null
+
+function rand(n) {
+  try {
+    const a = new Uint32Array(1);
+    crypto.getRandomValues(a);
+    return a[0] % n;
+  } catch (e) {
+    return Math.floor(Math.random() * n);
+  }
+}
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let k = a.length - 1; k > 0; k--) {
+    const j = rand(k + 1);
+    [a[k], a[j]] = [a[j], a[k]];
+  }
+  return a;
+}
+const total = () => Math.min(POR_TENTATIVA, BANCO.length);
+const acertos = () => answers.filter((a) => a === 0).length;
+const nota = () => Math.round((acertos() / total()) * 100);
+
+function readBest() {
+  try { const v = localStorage.getItem(CHAVE_MELHOR); return v === null ? null : Number(v); } catch (e) { return null; }
+}
+function writeBest(v) {
+  try { localStorage.setItem(CHAVE_MELHOR, String(v)); } catch (e) {}
+}
+function showBest() {
+  const b = readBest();
+  $("best").textContent = b === null || Number.isNaN(b) ? "—" : b;
+}
+
+function newAttempt() {
+  const sorteio = shuffle(BANCO.map((_, i) => i)).slice(0, total());
+  items = sorteio.map((i) => ({ i, ordem: shuffle([0, 1, 2, 3]) }));
+  pos = 0;
+  answers = Array(total()).fill(null);
+  render();
+}
+
+function renderTrail() {
+  const segs = $("segs");
+  segs.textContent = "";
+  for (let k = 0; k < total(); k++) {
+    const s = document.createElement("span");
+    if (answers[k] === 0) s.className = "ok";
+    else if (answers[k] !== null && answers[k] !== undefined) s.className = "bad";
+    else if (k === pos) s.className = "now";
+    segs.appendChild(s);
+  }
+  const done = pos >= total();
+  $("count").textContent = done ? "Tentativa concluída" : `Questão ${pos + 1} de ${total()}`;
+  const pts = acertos() * (100 / total());
+  $("points").textContent = `${Math.round(pts)} pontos`;
+}
+
+function render() {
+  renderTrail();
+  if (pos >= total()) { showResult(); return; }
+  $("quiz").hidden = false;
+  $("result").hidden = true;
+
+  const it = items[pos];
+  const q = BANCO[it.i];
+  $("cat").textContent = q.categoria;
+  $("qnum").textContent = `Q${pos + 1}`;
+  $("question").textContent = q.pergunta;
+
+  const list = $("options");
+  list.textContent = "";
+  it.ordem.forEach((orig, k) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt";
+    b.id = `opt-${k}`;
+    b.dataset.k = k;
+    const key = document.createElement("span");
+    key.className = "key";
+    key.textContent = LETRAS[k];
+    const txt = document.createElement("span");
+    txt.className = "txt";
+    txt.textContent = q.alternativas[orig];
+    b.append(key, txt);
+    b.addEventListener("click", () => answer(k));
+    li.appendChild(b);
+    list.appendChild(li);
+  });
+
+  $("feedback").hidden = true;
+  $("next").hidden = true;
+  if (answers[pos] !== null) paintAnswer(false);
+}
+
+function answer(k) {
+  if (pos >= total() || answers[pos] !== null) return;
+  answers[pos] = items[pos].ordem[k];
+  paintAnswer(true);
+  renderTrail();
+}
+
+function paintAnswer(moveFocus) {
+  const it = items[pos];
+  const q = BANCO[it.i];
+  const chosen = answers[pos];
+  const correctK = it.ordem.indexOf(0);
+  document.querySelectorAll(".opt").forEach((b) => {
+    const orig = it.ordem[Number(b.dataset.k)];
+    b.disabled = true;
+    if (orig === 0) b.classList.add("correct");
+    else if (orig === chosen) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+  const fb = $("feedback");
+  const certo = chosen === 0;
+  fb.classList.toggle("bad", !certo);
+  $("verdict").textContent = certo ? "Correto." : `Incorreto. A resposta certa é a ${LETRAS[correctK]}.`;
+  $("explain").textContent = q.explicacao;
+  fb.hidden = false;
+  const next = $("next");
+  next.textContent = pos === total() - 1 ? "Ver resultado" : "Próxima questão";
+  next.hidden = false;
+  if (moveFocus) next.focus({ preventScroll: true });
+}
+
+function goNext() {
+  if (answers[pos] === null) return;
+  pos++;
+  render();
+  if (pos < total()) $("quiz").scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+function bandFor(n) {
+  if (n >= 90) return ["Excelente", "ok"];
+  if (n >= 70) return ["Bom", "ok"];
+  if (n >= 50) return ["Regular", ""];
+  return ["Precisa revisar", "bad"];
+}
+
+function showResult() {
+  $("quiz").hidden = true;
+  $("result").hidden = false;
+  const n = nota();
+  $("score").textContent = n;
+  const [label, cls] = bandFor(n);
+  const band = $("band");
+  band.textContent = label;
+  band.className = `band ${cls}`.trim();
+  const a = acertos();
+  $("summary").textContent = `${a} ${a === 1 ? "acerto" : "acertos"} em ${total()} questões.`;
+
+  const best = readBest();
+  if (best === null || Number.isNaN(best) || n > best) writeBest(n);
+  showBest();
+
+  const rv = $("review");
+  rv.textContent = "";
+  items.forEach((it, k) => {
+    const q = BANCO[it.i];
+    const certo = answers[k] === 0;
+    const li = document.createElement("li");
+
+    const head = document.createElement("div");
+    head.className = "rv-head";
+    const pill = document.createElement("span");
+    pill.className = `pill ${certo ? "ok" : "bad"}`;
+    pill.textContent = certo ? "Acertou" : "Errou";
+    const cat = document.createElement("span");
+    cat.className = "rv-cat";
+    cat.textContent = `Q${k + 1} · ${q.categoria}`;
+    head.append(pill, cat);
+
+    const pq = document.createElement("p");
+    pq.className = "rv-q";
+    pq.textContent = q.pergunta;
+    li.append(head, pq);
+
+    if (!certo) {
+      const sua = document.createElement("p");
+      sua.className = "rv-a";
+      sua.append("Sua resposta: ");
+      const b1 = document.createElement("b");
+      b1.textContent = q.alternativas[answers[k]];
+      sua.appendChild(b1);
+      li.appendChild(sua);
+    }
+    const ok = document.createElement("p");
+    ok.className = "rv-a";
+    ok.append("Resposta correta: ");
+    const b2 = document.createElement("b");
+    b2.textContent = q.alternativas[0];
+    ok.appendChild(b2);
+
+    const det = document.createElement("details");
+    const sum = document.createElement("summary");
+    sum.textContent = "Ver explicação";
+    const ex = document.createElement("p");
+    ex.textContent = q.explicacao;
+    det.append(sum, ex);
+
+    li.append(ok, det);
+    rv.appendChild(li);
+  });
+}
+
+$("next").addEventListener("click", goNext);
+$("restart").addEventListener("click", () => { newAttempt(); window.scrollTo({ top: 0 }); });
+$("again").addEventListener("click", () => { newAttempt(); window.scrollTo({ top: 0 }); });
+
+document.addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (pos >= total() || $("quiz").hidden) return;
+  const k = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
+  if (e.key.length === 1 && k >= 0 && k < 4) { answer(k); return; }
+  if (e.key === "Enter" && answers[pos] !== null) {
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag !== "BUTTON" && tag !== "SUMMARY") { e.preventDefault(); goNext(); }
+  }
+});
+
+showBest();
+
+async function init() {
+  try {
+    const r = await fetch("questoes.json", { cache: "no-cache" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const dados = await r.json();
+    if (!Array.isArray(dados) || dados.length === 0) throw new Error("banco vazio");
+    BANCO = dados;
+    $("bankInfo").textContent = `Azure Fundamentals · ${BANCO.length} questões · ${total()} por tentativa`;
+    newAttempt();
+  } catch (e) {
+    $("trail").hidden = true;
+    $("cat").textContent = "Erro";
+    $("qnum").textContent = "";
+    $("question").textContent = "Não foi possível carregar o arquivo questoes.json. Se você abriu o index.html direto do computador, rode um servidor local (veja o README).";
+  }
+}
+init();
+</script>
+</body>
+</html>
